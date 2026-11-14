@@ -306,7 +306,7 @@ namespace TraccarClientWPF
         {
             try
             {
-                var response = await HttpClient.GetAsync("https://www.google.com");
+                var response = await HttpClient.GetAsync("https://example.com");
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -559,7 +559,6 @@ namespace TraccarClientWPF
             TxtStatus.Text = "自動送信を停止しました";
             TxtStatus.Foreground = System.Windows.Media.Brushes.Gray;
         }
-
     }
 
     // ==================== データモデルクラス ====================
