@@ -118,7 +118,7 @@ namespace TraccarClientWPF
         {
             var defaultConfig = new AppConfig
             {
-                TraccarUrl = "http://example.com:5055",
+                TraccarUrl = "",
                 DeviceId = "123456",
                 Interval = 30,
                 AutoStart = false
@@ -306,7 +306,8 @@ namespace TraccarClientWPF
         {
             try
             {
-                var response = await HttpClient.GetAsync("https://example.com");
+                string url = _config.TraccarUrl;
+                var response = await HttpClient.GetAsync(url);
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -337,9 +338,9 @@ namespace TraccarClientWPF
 
                 if (wifiAps.Count == 0)
                 {
-                    TxtStatus.Text = "エラー: 周囲のWi-Fi(BSSID)が検出できませんでした";
+                    TxtStatus.Text = "エラー: 周囲のWi-Fiが検出できませんでした";
                     TxtStatus.Foreground = System.Windows.Media.Brushes.Red;
-                    TxtLog.Text = "Wi-Fi機能およびOSの位置情報許可を確認してください。";
+                    TxtLog.Text = "Wi-Fi機能を確認してください。";
                     return;
                 }
 
