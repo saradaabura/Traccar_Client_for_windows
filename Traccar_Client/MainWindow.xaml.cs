@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,8 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Newtonsoft.Json;
-using Microsoft.Toolkit.Uwp.Notifications;
+using Traccar_Client;
 
 
 namespace TraccarClientWPF
@@ -95,8 +96,24 @@ namespace TraccarClientWPF
         }
 
         // 「×」ボタンが押されたときの挙動（トレイへ格納）
+        public partial class App : System.Windows.Application
+        {
+            // Shutdownによる終了かどうかのフラグ
+            public static bool IsShuttingDown { get; private set; } = false;
+
+            public static void ForceShutdown(int exitCode = 0)
+            {
+                IsShuttingDown = true;
+                Current.Shutdown(exitCode);
+            }
+        }
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            if (App.IsShuttingDown)
+            {
+                base.OnClosing(e);
+                return;
+            }
             if (!_isReallyClosing)
             {
                 new ToastContentBuilder()
@@ -559,6 +576,11 @@ namespace TraccarClientWPF
             BtnManual.IsEnabled = true;
             TxtStatus.Text = "自動送信を停止しました";
             TxtStatus.Foreground = System.Windows.Media.Brushes.Gray;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.ForceShutdown(0);
         }
     }
 
