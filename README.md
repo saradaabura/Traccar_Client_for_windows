@@ -10,6 +10,7 @@
 - オフライン時の位置情報のバッファ
 ## 動作概要
 　ユーザ設定はconfig.jsonに保存されます。アプリは起動時にconfig.jsonを読み込みます。設定された間隔で位置情報の取得、送信を行います。位置情報の取得・送信の流れ(今すぐ送信を押したときの動作)を文字と図で説明します。
+![About this App(illust)](./Traccar_Client/images/About_this_App.png)
 ### 1.Wi-Fi情報・バッテリ情報の取得
 　アプリははじめに、netshコマンドより、周辺のWi-Fi APのBSSID(MACアドレス)と信号強度(RSSI)を取得します。  
 　バッテリ残量・バッテリ充電状態は、Win32 APIより取得します。
