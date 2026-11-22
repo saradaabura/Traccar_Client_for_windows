@@ -526,13 +526,17 @@ namespace TraccarClientWPF
                 { "id", deviceId },
                 { "lat", lat.ToString(System.Globalization.CultureInfo.InvariantCulture) },
                 { "lon", lon.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-                { "timestamp", timestamp.ToString() }
+                { "timestamp", timestamp.ToString() },
             };
 
             if (accuracy.HasValue) query["accuracy"] = accuracy.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (batt.HasValue) query["batt"] = batt.Value.ToString();
             if (charging.HasValue) query["charge"] = charging.Value ? "true" : "false";
-            if (is_SOS_en.IsSosEn) query["sos"] = "sos";
+            if (is_SOS_en.IsSosEn)
+            {
+                query["alarm"] = "sos";
+            }
+            is_SOS_en.IsSosEn = false;
 
             var builder = new UriBuilder(traccarUrl);
             var queryBuilder = System.Web.HttpUtility.ParseQueryString(string.Empty);
@@ -623,7 +627,6 @@ namespace TraccarClientWPF
             BtnManual.IsEnabled = false;
             is_SOS_en.IsSosEn = true;
             ExecutePipelineAsync();
-            is_SOS_en.IsSosEn = false;
             BtnManual.IsEnabled = true;
         }
         public static class is_SOS_en
