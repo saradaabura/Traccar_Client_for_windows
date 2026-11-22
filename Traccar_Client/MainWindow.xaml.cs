@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Traccar_Client;
+using Windows.Web.Http.Diagnostics;
 
 
 namespace TraccarClientWPF
@@ -321,14 +322,45 @@ namespace TraccarClientWPF
 
         private async Task<bool> IsOnlineAsync()
         {
+            string url = _config.TraccarUrl;
+
+            // URLの形式を確認
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri) ||
+                (uri.Scheme != Uri.UriSchemeHttp &&
+                 uri.Scheme != Uri.UriSchemeHttps))
+            {
+                TxtLog.Text = $"URLが不正です: {url}";
+                return false;
+            }
+
             try
             {
-                string url = _config.TraccarUrl;
-                var response = await HttpClient.GetAsync(url);
-                return response.IsSuccessStatusCode;
+                using (var response = await HttpClient.GetAsync(
+                    uri,
+                    HttpCompletionOption.ResponseHeadersRead))
+                {
+                    int statusCode = (int)response.StatusCode;
+
+                    TxtLog.Text =
+                        $"サーバー応答あり: HTTP {statusCode} ({response.StatusCode})";
+
+                    // HTTPレスポンスが返ってきたので通信可能と判断
+                    return true;
+                }
             }
-            catch
+            catch (TaskCanceledException ex)
             {
+                TxtLog.Text = $"通信タイムアウト: {ex.Message}";
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                TxtLog.Text = $"HTTP通信エラー: {ex.Message}";
+                return false;
+            }
+            catch (Exception ex)
+            {
+                TxtLog.Text = $"接続確認エラー: {ex.Message}";
                 return false;
             }
         }
@@ -377,12 +409,13 @@ namespace TraccarClientWPF
                 TxtStatus.Text = $"ネットワーク接続を確認中... (総データ: {records.Count}件)";
                 StatusProgressBar.Value = 50;
 
+                bool is_able_to_send = await IsOnlineAsync();
                 if (!await IsOnlineAsync())
                 {
                     TxtStatus.Text = $"オフラインのためバッファに保存しました (未送信: {records.Count}件)";
                     StatusProgressBar.Foreground = new SolidColorBrush(Colors.Orange);
                     TxtStatus.Foreground = System.Windows.Media.Brushes.Orange;
-                    TxtLog.Text = $"時刻: {currentTimestamp}\n現在オフラインのため、通信回復時にまとめて送信します。";
+                    TxtLog.Text = $"時刻: {currentTimestamp}\n現在オフラインのため、通信回復時にまとめて送信します。\nサーバ: {url}\n[is_able_to_send]: {is_able_to_send}";
                     return;
                 }
 
@@ -499,6 +532,7 @@ namespace TraccarClientWPF
             if (accuracy.HasValue) query["accuracy"] = accuracy.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (batt.HasValue) query["batt"] = batt.Value.ToString();
             if (charging.HasValue) query["charge"] = charging.Value ? "true" : "false";
+            if (is_SOS_en.IsSosEn) query["sos"] = "sos";
 
             var builder = new UriBuilder(traccarUrl);
             var queryBuilder = System.Web.HttpUtility.ParseQueryString(string.Empty);
@@ -581,6 +615,20 @@ namespace TraccarClientWPF
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             App.ForceShutdown(0);
+        }
+
+        private void send_sos(object sender, RoutedEventArgs e)
+        {
+            
+            BtnManual.IsEnabled = false;
+            is_SOS_en.IsSosEn = true;
+            ExecutePipelineAsync();
+            is_SOS_en.IsSosEn = false;
+            BtnManual.IsEnabled = true;
+        }
+        public static class is_SOS_en
+        {
+            public static bool IsSosEn { get; set; } = false;
         }
     }
 

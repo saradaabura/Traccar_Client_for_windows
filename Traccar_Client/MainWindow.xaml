@@ -42,6 +42,7 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="BtnManual" Grid.Column="0" Content="今すぐ送信" Click="BtnManual_Click" Padding="15,8"/>
             <CheckBox x:Name="ChkAutoSend" Grid.Column="2" Content="自動送信を有効化" Checked="ChkAutoSend_Checked" Unchecked="ChkAutoSend_Unchecked" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="SOS" HorizontalAlignment="Left" VerticalAlignment="Center" Height="29" Width="72" Background="#FFB74D4D" Foreground="White" FontSize="16" Margin="18,0,0,0" Click="send_sos"/>
         </Grid>
 
         <!-- ステータス・ログカードエリア -->
