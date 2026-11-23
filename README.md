@@ -1,4 +1,5 @@
 # Traccar Client For Windows
+**Japanese/日本語**
 　このアプリはWindowsで動作するTraccar Clientです。Android IOSのTraccar Clientと同じように、位置情報を取得してTraccarサーバーに送信することができます。ただし、すべての機能が実装されているわけではありません。  
 ユーザが設定するサーバ以外に**位置情報は送信**しません。周辺のWi-Fi AP情報(BSSID,RSSI)は**位置情報取得**のために[BeaconDB](https://api.beacondb.net/v1/geolocate)に送信されます。
 ## 機能
